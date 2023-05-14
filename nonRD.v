@@ -1,7 +1,6 @@
 module nonRD(
-    input bgn, clk, rst_b, 
+    input clk, rst_b, 
     input [8:0] inbus,
-    output done,
     output [8:0] outbus
 );
     wire[7:0] reg_a, reg_m, reg_q;
@@ -70,3 +69,39 @@ module nonRD(
                          .out_add(adder_output));
 
 endmodule
+
+module nonRD_tb;
+    reg clk, rst_b;
+    reg [8:0] inbus;
+    wire [8:0] outbus;
+
+    boothr4 inst(.clk(clk),
+                 .rst_b(rst_b),
+                 .inbus(inbus),
+                 .outbus(outbus));
+                     
+    localparam CLOCK_CYCLES = 160, CLOCK_PERIOD = 100;
+    localparam RST_PULSE = 25, NUMBER_SETS = 10;
+
+    initial begin 
+        clk = 0;
+        repeat(CLOCK_CYCLES * 2)
+            #(CLOCK_PERIOD / 2) clk = ~clk;
+    end
+
+    initial begin 
+        rst_b = 0; bgn = 1;
+        #(RST_PULSE) rst_b = 1;
+    end
+
+    initial begin 
+        repeat(NUMBER_SETS) begin
+            inbus = $urandom(); //8'b00111000;
+            #(200)
+            inbus = $urandom(); // 8'b10101101;
+            #(200)
+            inbus = 8'bz;
+            #(1200) inbus = 8'bz;
+        end
+    end
+endmodule 
