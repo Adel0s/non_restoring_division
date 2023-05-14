@@ -1,0 +1,3 @@
+reg_m
+reg_q
+counter
